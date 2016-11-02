@@ -15,10 +15,12 @@ class MajorEventsSpider(scrapy.Spider):
 
     def parse(self, response):
         for event in response.css('.table-bordered tr'):
-			item = MajorEventItem()
-			item['name'] = event.css('td a::text').extract()
-			item['prizepool'] = event.css('td:nth-child(6)::text').extract()
-			item['location'] = event.css('td:nth-child(8)::text').extract()
-			item['winner'] = event.css('td:nth-child(9) span span:nth-child(2) a::text').extract()
-			item['runnerUp'] = event.css('td:nth-child(10) span span:nth-child(2) a::text').extract()
-			yield item
+
+            if event.css('td a::text').extract():
+    			item = MajorEventItem()
+    			item['name'] = event.css('td a::text').extract()
+    			item['prizepool'] = event.css('td:nth-child(6)::text').extract()
+    			item['location'] = event.css('td:nth-child(8)::text').extract()
+    			item['winner'] = event.css('td:nth-child(9) span span:nth-child(2) a::text').extract()
+    			item['runnerUp'] = event.css('td:nth-child(10) span span:nth-child(2) a::text').extract()
+    			yield item

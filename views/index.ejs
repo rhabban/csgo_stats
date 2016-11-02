@@ -12,6 +12,11 @@
         <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
         <script src="http://d3js.org/d3.v3.min.js"></script>
 
+
+        <link href="https://cdn.datatables.net/plug-ins/1.10.7/integration/bootstrap/3/dataTables.bootstrap.css" rel="stylesheet" />
+        <script src="https://cdn.datatables.net/1.10.7/js/jquery.dataTables.min.js"></script>
+        <script src="https://cdn.datatables.net/plug-ins/1.10.7/integration/bootstrap/3/dataTables.bootstrap.js"></script>
+
         <link rel="stylesheet" href="/css/main.css">
     </head>
     <body>
@@ -27,9 +32,54 @@
             </div>
             <br/>
             <div class="container">
+
                 <div class="row">
+                    <ul class="nav nav-tabs">
+                      <li class="active"><a href="#">Major events</a></li>
+                      <li><a href="#">Minor events</a></li>
+                      <li><a href="#">Teams</a></li>
+                      <li><a href="#">Players</a></li>
+                    </ul>
+                </div>
+
+                <br>
+                <br>
+                <div class="row well">
+                    <table id="majorEventsTable" class="table table-hover">
+                        <thead>
+                          <tr>
+                            <th>Name</th>
+                            <th>Winner</th>
+                            <th>Runner up</th>
+                            <th>Prizepool</th>
+                            <th>Location</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+
+                        <% for(var i=0; i < events.length; i++) {%>
+                            <tr class="clickable-row">
+                                <td><%= events[i].name %></td>
+                                <td><%= events[i].winner %></td>
+                                <td><%= events[i].runnerUp %></td>
+                                <td><%= events[i].prizepool %></td>
+                                <td><%= events[i].location %></td>
+                            </tr>
+                        <% } %>
+                        </tbody>
+                      </table>
                 </div>
             </div>
         </div>
     </body>
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+          $('#majorEventsTable').dataTable();
+        });
+
+        $('#majorEventsTable').on('click', '.clickable-row', function(event) {
+          $(this).addClass('active').siblings().removeClass('active');
+        });
+    </script>
 </html>

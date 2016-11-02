@@ -12,11 +12,13 @@ var io = require('socket.io')(server);
 var fs = require('fs');
 var assert = require('assert');
 
+var majorevents;
+
     exec('scrapy crawl majorevents -t json --nolog -o - > "majorevents.json"', {
      cwd: 'scrapy/csgostats'
      }, function(error, stdout, stderr) {
-     majorevents = require('./scrapy/csgostats/majorevents.json');
-     console.log(majorevents);
+      majorevents = require('./scrapy/csgostats/majorevents.json');
+      console.log(majorevents);
      });
 
 //Mongoose
@@ -28,7 +30,7 @@ db.once('open', function () {
     console.log('connected to CSGO_STATS');
 
     app.get('/', function (req, res) {
-            res.render('index.ejs');
+            res.render('index.ejs', {events: majorevents});
         })
         .get('/about', function (req, res) {
             res.render('about.ejs');

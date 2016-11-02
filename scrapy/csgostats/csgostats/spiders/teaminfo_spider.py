@@ -1,4 +1,4 @@
-import scrapy
+"""import scrapy
 import json
 
 class TeamInfoItem(scrapy.Item):
@@ -27,3 +27,5 @@ class TeamInfoSpider(scrapy.Spider):
         for player in response.css('#p-navigation > div > ul > li'):
             item['players'].append(player.css('a::text').extract())
         yield item
+
+"""

@@ -13,13 +13,35 @@ var fs = require('fs');
 var assert = require('assert');
 
 var majorevents;
+var teams;
 
-    exec('scrapy crawl majorevents -t json --nolog -o - > "majorevents.json"', {
-     cwd: 'scrapy/csgostats'
-     }, function(error, stdout, stderr) {
-      majorevents = require('./scrapy/csgostats/majorevents.json');
-      console.log(majorevents);
-     });
+// Mongoose Schemas
+
+var majorEventSchema = mongoose.Schema({
+    name: String,
+    location: String,
+    prizepool: String,
+    winner: String,
+    runnerUp: String
+});
+
+var MajorEvent = mongoose.model('MajorEvent', majorEventSchema);
+
+// crawl major events
+exec('scrapy crawl majorevents -t json --nolog -o - > "majorevents.json"', {
+ cwd: 'scrapy/csgostats'
+ }, function(error, stdout, stderr) {
+  majorevents = require('./scrapy/csgostats/majorevents.json');
+  console.log(majorevents);
+ });
+
+//crawl teams list
+ exec('scrapy crawl teamname -t json --nolog -o - > "teamname.json"', {
+  cwd: 'scrapy/csgostats'
+  }, function(error, stdout, stderr) {
+   teams = require('./scrapy/csgostats/teamname.json');
+   console.log(teams);
+  });
 
 //Mongoose
 mongoose.connect('mongodb://localhost/CSGO_STATS');
@@ -34,6 +56,9 @@ db.once('open', function () {
         })
         .get('/about', function (req, res) {
             res.render('about.ejs');
+        })
+        .get('/teams', function(req, res){
+            res.render('teams.ejs', {teams: teams});
         })
         .use("/css", express.static(__dirname + "/css"))
         .use("*", function (req, res) {

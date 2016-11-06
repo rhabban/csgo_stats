@@ -12,6 +12,10 @@
         <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
         <script src="http://d3js.org/d3.v3.min.js"></script>
 
+        <link href="https://cdn.datatables.net/plug-ins/1.10.7/integration/bootstrap/3/dataTables.bootstrap.css" rel="stylesheet" />
+        <script src="https://cdn.datatables.net/1.10.7/js/jquery.dataTables.min.js"></script>
+        <script src="https://cdn.datatables.net/plug-ins/1.10.7/integration/bootstrap/3/dataTables.bootstrap.js"></script>
+
         <link rel="stylesheet" href="/css/main.css">
     </head>
     <body>
@@ -28,26 +32,54 @@
             <br/>
             <div class="container">
 
-                <div class="row">
-                    <ul class="nav nav-tabs">
-                      <li><a href="/">Major events</a></li>
-                      <li><a href="#">Minor events</a></li>
-                      <li class="active"><a href="teams">Teams</a></li>
-                      <li><a href="#">Players</a></li>
-                    </ul>
-                </div>
+            <div class="row">
+                <ul class="nav nav-tabs">
+                  <li><a href="/">Major events</a></li>
+                  <li><a href="#">Minor events</a></li>
+                  <li class="active"><a href="teams">Teams</a></li>
+                  <li><a href="#">Players</a></li>
+                </ul>
+            </div>
 
-                <br>
-                <br>
-                <div class="row well">
+            <br>
+            <br>
+            <div class="row well">  
 
-                  <div class="list-group">
+              <table id="teamsTable" class="table table-hover">
+                    <thead>
+                      <tr>
+                        <th>Name</th>
+                        <th>Country</th>
+                        <th>Total Earning</th>
+                        <th>Logo</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+
                     <% for(var i=0; i < teams.length; i++) {%>
-                    <span class="list-group-item"><%= teams[i].teamname %></span>
+                        <tr class="clickable-row">
+                            <td><%= teams[i].teamname %></td>
+                            <td><%= teams[i].country %></td>
+                            <td><%= teams[i].totalEarning %></td>
+                            <td><img width=100 src= <%= teams[i].logo %> /></td>
+                        </tr>
                     <% } %>
-                  </div>
+                    </tbody>
+                </table>
+              </div>
+
                 </div>
             </div>
         </div>
     </body>
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+          $('#teamsTable').dataTable();
+        });
+
+        $('#teamsTable').on('click', '.clickable-row', function(event) {
+          $(this).addClass('active').siblings().removeClass('active');
+        });
+    </script>
 </html>

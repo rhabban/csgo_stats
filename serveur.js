@@ -13,11 +13,22 @@ var fs = require('fs');
 var assert = require('assert');
 
 var majorEvents;
+var minorEvents;
 var teamInfo;
 
 // Mongoose Schemas
 
 var majorEventSchema = mongoose.Schema({
+    name: String,
+    location: String,
+    prizepool: String,
+    winner: String,
+    runnerUp: String,
+    country: String,
+    date: String
+});
+
+var minorEventSchema = mongoose.Schema({
     name: String,
     location: String,
     prizepool: String,
@@ -35,10 +46,14 @@ var teamInfoSchema = mongoose.Schema({
 });
 
 var MajorEvent = mongoose.model('MajorEvent', majorEventSchema);
+var MinorEvent = mongoose.model('MinorEvent', minorEventSchema);
 var TeamInfo = mongoose.model('TeamInfo', teamInfoSchema);
 
 majorEvents = [];
 getMajorEvent();
+
+minorEvents = [];
+getMinorEvent();
 
 teamInfo = [];
 getTeamInfo();
@@ -51,6 +66,10 @@ app.get('/', function (req, res) {
     })
     .get('/teams', function (req, res) {
         res.render('teams.ejs', {teams: teamInfo});
+    })
+
+    .get('/minorevents', function (req, res) {
+        res.render('minorevents.ejs', {events: minorEvents});
     })
     .use("/css", express.static(__dirname + "/css"))
     .use("/js", express.static(__dirname + "/js"))
@@ -76,6 +95,19 @@ function getMajorEvent() {
             if(err)
               console.log(err);
             majorEvents = events;
+            db.close();
+        });
+    });
+}
+
+function getMinorEvent() {
+    var db = getConnection();
+    db.on('error', console.error.bind(console, 'connection error:'));
+    db.once('open', function () {
+        MinorEvent.find({}, function (err, events) {
+            if(err)
+              console.log(err);
+            minorEvents = events;
             db.close();
         });
     });
@@ -129,6 +161,24 @@ function getTotalEarningByCountry(socket, data){
           socket.emit("sendTotalEarningByCountry", formatted_data);
         })
     });
+}
+
+function getEventsCount(events)
+{
+  var dataCount = [];
+  for(var i = 2012; i <= 2016; i++)
+  {
+    var count = 0;
+    events.forEach(function(event) 
+    {
+      console.log(event.date);
+      if(event.date.includes(i))
+      {
+        count++;
+      }
+    });
+    dataCount[i] = count;
+  }
 }
 
 function getConnection(){

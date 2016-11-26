@@ -4,11 +4,22 @@ var spawn = require('child_process').spawn; // exec OS commands
 var util = require('util');
 
 var majorEvents;
+var minorEvents;
 var teamInfo;
 
 // Mongoose Schemas
 
 var majorEventSchema = mongoose.Schema({
+    name: String,
+    location: String,
+    prizepool: String,
+    winner: String,
+    runnerUp: String,
+    country: String,
+    date: String
+});
+
+var minorEventSchema = mongoose.Schema({
     name: String,
     location: String,
     prizepool: String,
@@ -25,6 +36,7 @@ var teamInfoSchema = mongoose.Schema({
 });
 
 var MajorEvent = mongoose.model('MajorEvent', majorEventSchema);
+var MinorEvent = mongoose.model('MinorEvent', minorEventSchema);
 var TeamInfo = mongoose.model('TeamInfo', teamInfoSchema);
 
 // crawl major events
@@ -33,6 +45,14 @@ exec('scrapy crawl majorevents -t json --nolog -o - > "majorevents.json"', {
 }, function (error, stdout, stderr) {
     console.log("majorevents crawled");
     majorEvents = require('./scrapy/csgostats/majorevents.json');
+});
+
+// crawl minor events
+exec('scrapy crawl minorevents -t json --nolog -o - > "minorevents.json"', {
+    cwd: 'scrapy/csgostats'
+}, function (error, stdout, stderr) {
+    console.log("minorevents crawled");
+    minorEvents = require('./scrapy/csgostats/minorevents.json');
 });
 
 //crawl teams list
@@ -58,17 +78,39 @@ function insertDataInDb() {
         console.log("DB opened");
         for (var i = 0; i < majorEvents.length; i++) {
             var event = majorEvents[i];
+            //this removes the first two unexpected chars
+            var location = event.location.toString().substring(2);
             var item = new MajorEvent({
                 name: event.name,
-                location: event.location,
+                location: location,
                 prizepool: event.prizepool,
                 winner: event.winner,
                 runnerUp: event.runnerUp,
                 date: event.date,
-                country: event.coutry,
+                country: event.country,
                 upsert: true
             });
             MajorEvent.update({name: event.name}, item, {upsert: true}, function (err) {
+              if(err)
+                console.log(err);
+            });
+        }
+
+        for (var i = 0; i < minorEvents.length; i++) {
+            var event = minorEvents[i];
+            //this removes the first two unexpected chars
+            var location = event.location.toString().substring(2);
+            var item = new MinorEvent({
+                name: event.name,
+                location: location,
+                prizepool: event.prizepool,
+                winner: event.winner,
+                runnerUp: event.runnerUp,
+                date: event.date,
+                country: event.country,
+                upsert: true
+            });
+            MinorEvent.update({name: event.name}, item, {upsert: true}, function (err) {
               if(err)
                 console.log(err);
             });

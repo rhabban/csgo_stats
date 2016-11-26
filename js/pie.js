@@ -5,7 +5,7 @@ var loadChart = function(data, pays){
       return false;
   }
   $(function () {
-      Highcharts.chart('container', {
+      Highcharts.chart('chartContainer', {
           chart: {
               plotBackgroundColor: null,
               plotBorderWidth: null,
@@ -13,7 +13,7 @@ var loadChart = function(data, pays){
               type: 'pie'
           },
           title: {
-              text: 'Total earning (of all time) by Country : '+pays
+              text: 'Total earned (of all time) for : '+pays
           },
           tooltip: {
               pointFormat: '{series.name}: <b>{point.totalEarning}$</b>'

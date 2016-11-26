@@ -16,6 +16,12 @@
         <script src="https://cdn.datatables.net/1.10.7/js/jquery.dataTables.min.js"></script>
         <script src="https://cdn.datatables.net/plug-ins/1.10.7/integration/bootstrap/3/dataTables.bootstrap.js"></script>
 
+        <!-- Hightcharts lib -->
+        <script src="https://code.highcharts.com/highcharts.js"></script>
+        <script src="https://code.highcharts.com/modules/exporting.js"></script>
+
+        <script src="/js/pie.js"></script>
+
         <link rel="stylesheet" href="/css/main.css">
     </head>
     <body>
@@ -43,7 +49,8 @@
 
             <br>
             <br>
-            <div class="row well">  
+            <div id="container" style="min-width: 310px; height: 400px; max-width: 600px; margin: 0 auto"></div>
+            <div class="row well">
 
               <table id="teamsTable" class="table table-hover">
                     <thead>
@@ -51,7 +58,6 @@
                         <th>Name</th>
                         <th>Country</th>
                         <th>Total Earning</th>
-                        <th>Logo</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -61,7 +67,6 @@
                             <td><%= teams[i].teamname %></td>
                             <td><%= teams[i].country %></td>
                             <td><%= teams[i].totalEarning %></td>
-                            <td><img width=100 src= <%= teams[i].logo %> /></td>
                         </tr>
                     <% } %>
                     </tbody>
@@ -73,13 +78,24 @@
         </div>
     </body>
 
+    <script src="/socket.io/socket.io.js"></script>
     <script type="text/javascript">
+        var socket = io.connect('http://localhost:8080');
+
+        socket.emit("getTotalEarningByCountry", "All");
+
         $(document).ready(function() {
           $('#teamsTable').dataTable();
+          loadChart();
         });
 
         $('#teamsTable').on('click', '.clickable-row', function(event) {
           $(this).addClass('active').siblings().removeClass('active');
         });
+
+        socket.on('Zerror', function (message) {
+            console.log(message);
+        });
+
     </script>
 </html>

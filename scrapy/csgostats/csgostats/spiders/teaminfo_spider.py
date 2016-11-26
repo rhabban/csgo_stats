@@ -5,7 +5,6 @@ import os
 class TeamInfoItem(scrapy.Item):
     teamname = scrapy.Field()
     country = scrapy.Field()
-    logo = scrapy.Field()
     totalEarning = scrapy.Field()
 
 class TeamInfoSpider(scrapy.Spider):
@@ -21,16 +20,16 @@ class TeamInfoSpider(scrapy.Spider):
 
     def parse(self, response):
         #check if game is global offensive
-        if "Global Offensive" in str(response.css('#mw-content-text > div.fo-nttax-infobox-wrapper > div.fo-nttax-infobox.wiki-bordercolor-light > div > div > i > a::text').extract_first()):
-            item = TeamInfoItem()
-            item['teamname'] = response.css('#firstHeading::text').extract_first()
-            item['country'] = response.css('#mw-content-text > div.fo-nttax-infobox-wrapper > div.fo-nttax-infobox.wiki-bordercolor-light > div:nth-child(4) > div:nth-child(2) > a:nth-child(2)::text').extract_first()
-            item['logo'] = response.css('#mw-content-text > div.fo-nttax-infobox-wrapper > div.fo-nttax-infobox.wiki-bordercolor-light > div:nth-child(2) > div > div > div > a > img::attr(src)').extract_first()
+        gameNodes = response.css('#mw-content-text > div.fo-nttax-infobox-wrapper > div.fo-nttax-infobox.wiki-bordercolor-light > div > div > i')
+        for gameNode in gameNodes:
+            if "Global Offensive" in str(gameNode.css('a::text').extract_first()):
+                item = TeamInfoItem()
+                item['teamname'] = response.css('#firstHeading::text').extract_first()
+                item['country'] = response.css('#mw-content-text > div.fo-nttax-infobox-wrapper > div.fo-nttax-infobox.wiki-bordercolor-light > div:nth-child(4) > div:nth-child(2) > a:nth-child(2)::text').extract_first()
 
-            descNodes = response.css('#mw-content-text > div.fo-nttax-infobox-wrapper > div.fo-nttax-infobox.wiki-bordercolor-light > div')
-            for descNode in descNodes:
-                if "Total Earnings:" in str(descNode.css('div.infobox-cell-2.infobox-description::text').extract_first()):
-                    item['totalEarning'] = descNode.css('div.infobox-cell-2.infobox-description + div.infobox-cell-2::text').extract_first()
+                descNodes = response.css('#mw-content-text > div.fo-nttax-infobox-wrapper > div.fo-nttax-infobox.wiki-bordercolor-light > div')
+                for descNode in descNodes:
+                    if "Total Earnings:" in str(descNode.css('div.infobox-cell-2.infobox-description::text').extract_first()):
+                        item['totalEarning'] = descNode.css('div.infobox-cell-2.infobox-description + div.infobox-cell-2::text').extract_first()
 
-            yield item
-        
+                yield item

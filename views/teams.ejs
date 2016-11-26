@@ -61,13 +61,14 @@
                       </tr>
                     </thead>
                     <tbody>
-
-                    <% for(var i=0; i < teams.length; i++) {%>
-                        <tr class="clickable-row">
-                            <td><%= teams[i].teamname %></td>
-                            <td><%= teams[i].country %></td>
-                            <td><%= teams[i].totalEarning %></td>
-                        </tr>
+                    <% if (teams) { %>
+                      <% for(var i=0; i < teams.length; i++) {%>
+                          <tr class="clickable-row">
+                              <td><%= teams[i].teamname %></td>
+                              <td><%= teams[i].country %></td>
+                              <td><%= teams[i].totalEarning %></td>
+                          </tr>
+                        <% } %>
                     <% } %>
                     </tbody>
                 </table>
@@ -96,6 +97,10 @@
         socket.on('Zerror', function (message) {
             console.log(message);
         });
+
+        socket.on('sendTotalEarningByCountry', function(data){
+            loadChart(data);
+        })
 
     </script>
 </html>

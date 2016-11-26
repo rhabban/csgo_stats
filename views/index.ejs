@@ -56,15 +56,16 @@
                           </tr>
                         </thead>
                         <tbody>
-
-                        <% for(var i=0; i < events.length; i++) {%>
-                            <tr class="clickable-row">
-                                <td><%= events[i].name %></td>
-                                <td><%= events[i].winner %></td>
-                                <td><%= events[i].runnerUp %></td>
-                                <td><%= events[i].prizepool %></td>
-                                <td><%= events[i].location %></td>
-                            </tr>
+                        <% if(events) {%>
+                          <% for(var i=0; i < events.length; i++) {%>
+                              <tr class="clickable-row">
+                                  <td><%= events[i].name %></td>
+                                  <td><%= events[i].winner %></td>
+                                  <td><%= events[i].runnerUp %></td>
+                                  <td><%= events[i].prizepool %></td>
+                                  <td><%= events[i].location %></td>
+                              </tr>
+                          <% } %>
                         <% } %>
                         </tbody>
                       </table>

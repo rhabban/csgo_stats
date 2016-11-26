@@ -12,7 +12,7 @@ var io = require('socket.io')(server);
 var fs = require('fs');
 var assert = require('assert');
 
-var majorevents;
+var majorEvents;
 var teamInfo;
 
 // Mongoose Schemas
@@ -38,7 +38,7 @@ var MajorEvent = mongoose.model('MajorEvent', majorEventSchema);
 var TeamInfo = mongoose.model('TeamInfo', teamInfoSchema);
 
 // crawl major events
-exec('scrapy crawl majorevents -t json --nolog -o - > "majorevents.json"', {
+/*exec('scrapy crawl majorevents -t json --nolog -o - > "majorevents.json"', {
     cwd: 'scrapy/csgostats'
 }, function (error, stdout, stderr) {
     console.log("majorevents crawled");
@@ -57,11 +57,16 @@ exec('scrapy crawl teamname -t json --nolog -o - > "teamname.json"', {
         teamInfo = require('./scrapy/csgostats/teaminfo.json');
         insertDataInDb();
     });
-});
+});*/
+
+majorEvents = [];
+getMajorEvent();
+
+teamInfo = [];
+getTeamInfo();
 
 app.get('/', function (req, res) {
-        res.render('index.ejs', {events: majorevents});
-        getMajorEvent();
+        res.render('index.ejs', {events: majorEvents});
     })
     .get('/about', function (req, res) {
         res.render('about.ejs');
@@ -81,12 +86,7 @@ console.log('Listening at localhost:8080');
 io.on('connection', function (socket) {
     //Get total Earning By Team
     socket.on('getTotalEarningByCountry', function (data) {
-        var res = getTotalEarningByCountry(socket, data);
-        if(res){
-            console.log(data);
-        } else {
-            console.log('Error while retrieving totalEarning');
-        }
+      getTotalEarningByCountry(socket, data);
     });
 });
 
@@ -97,8 +97,8 @@ function insertDataInDb() {
     db.on('error', console.error.bind(console, 'connection error:'));
     db.once('open', function () {
         console.log("DB opened");
-        for (var i = 0; i < majorevents.length; i++) {
-            var event = majorevents[i];
+        for (var i = 0; i < majorEvents.length; i++) {
+            var event = majorEvents[i];
             var item = new MajorEvent({
                 name: event.name,
                 location: event.location,
@@ -137,8 +137,9 @@ function getMajorEvent() {
     db.on('error', console.error.bind(console, 'connection error:'));
     db.once('open', function () {
         MajorEvent.find({}, function (err, events) {
-            //return events;
-            console.log(events);
+            if(err)
+              console.log(err);
+            majorEvents = events;
             db.close();
         });
     });
@@ -149,8 +150,10 @@ function getTeamInfo() {
     db.on('error', console.error.bind(console, 'connection error:'));
     db.once('open', function () {
         TeamInfo.find({}, function (err, teams) {
-            //return teams;
-            console.log(teams);
+            if(err)
+              console.log(err);
+            teamInfo =teams;
+            db.close();
         });
     });
 }
@@ -161,12 +164,32 @@ function getTotalEarningByCountry(socket, data){
     db.once('open', function () {
         TeamInfo.find({}).limit(5).select('teamname country totalEarning').exec(function(err, teams){
           db.close();
-          var series = [{
+          var formatted_items = [];
+          var totalEarningByRes = 0;
+
+          for (var i = 0; i < teams.length; i++) {
+            totalEarning = teams[i].totalEarning;
+            //formatted_totalEarning = totalEarning.replace("$", "");
+            var item = {
+              name: teams[i].teamname,
+              totalEarning: teams[i].totalEarning,
+            };
+            formatted_items.push(item);
+            totalEarningByRes+=teams[i].totalEarning;
+          }
+
+          for (var i = 0; i < formatted_items.length; i++) {
+            formatted_items[i].y = (formatted_items[i].totalEarning * 100) / totalEarningByRes;
+            console.log(totalEarningByRes);
+          }
+
+          var formatted_data = [{
               name: 'Total earning',
               colorByPoint: true,
-              data: teams
+              data: formatted_items
           }];
-          socket.emit("Zerror", teams);
+
+          socket.emit("sendTotalEarningByCountry", formatted_data);
         })
     });
 }

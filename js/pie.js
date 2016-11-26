@@ -1,36 +1,9 @@
 var loadChart = function(data, pays){
   if(!pays)
       pays = "All";
-  if(!data)
-      data = [{
-          name: 'Total earning',
-          colorByPoint: true,
-          data: [{
-              name: 'VP',
-              totalEarning: 13250,
-              y: 56.33
-          }, {
-              name: 'Chrome',
-              totalEarning: 1325,
-              y: 24.03,
-          }, {
-              name: 'Firefox',
-              totalEarning: 13250,
-              y: 10.38
-          }, {
-              name: 'Safari',
-              totalEarning: 13250,
-              y: 4.77
-          }, {
-              name: 'Opera',
-              totalEarning: 13250,
-              y: 0.91
-          }, {
-              name: 'Proprietary or Undetectable',
-              totalEarning: 13250,
-              y: 0.2
-          }]
-      }];
+  if(!data){
+      return false;
+  }
   $(function () {
       Highcharts.chart('container', {
           chart: {

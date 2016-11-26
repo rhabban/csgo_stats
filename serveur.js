@@ -30,34 +30,12 @@ var majorEventSchema = mongoose.Schema({
 var teamInfoSchema = mongoose.Schema({
     teamname: String,
     country: String,
-    totalEarning: String,
+    totalEarning: Number,
     logo: String
 });
 
 var MajorEvent = mongoose.model('MajorEvent', majorEventSchema);
 var TeamInfo = mongoose.model('TeamInfo', teamInfoSchema);
-
-// crawl major events
-/*exec('scrapy crawl majorevents -t json --nolog -o - > "majorevents.json"', {
-    cwd: 'scrapy/csgostats'
-}, function (error, stdout, stderr) {
-    console.log("majorevents crawled");
-    majorevents = require('./scrapy/csgostats/majorevents.json');
-});
-
-//crawl teams list
-exec('scrapy crawl teamname -t json --nolog -o - > "teamname.json"', {
-    cwd: 'scrapy/csgostats'
-}, function (error, stdout, stderr) {
-    console.log("team names crawled");
-    exec('scrapy crawl teaminfo -t json --nolog -o - > "teaminfo.json"', {
-        cwd: 'scrapy/csgostats'
-    }, function (error, stdout, stderr) {
-        console.log("team info crawled");
-        teamInfo = require('./scrapy/csgostats/teaminfo.json');
-        insertDataInDb();
-    });
-});*/
 
 majorEvents = [];
 getMajorEvent();
@@ -90,48 +68,6 @@ io.on('connection', function (socket) {
     });
 });
 
-
-function insertDataInDb() {
-    console.log('Insert in DB');
-    var db = getConnection();
-    db.on('error', console.error.bind(console, 'connection error:'));
-    db.once('open', function () {
-        console.log("DB opened");
-        for (var i = 0; i < majorEvents.length; i++) {
-            var event = majorEvents[i];
-            var item = new MajorEvent({
-                name: event.name,
-                location: event.location,
-                prizepool: event.prizepool,
-                winner: event.winner,
-                runnerUp: event.runnerUp,
-                date: event.date,
-                country: event.coutry,
-                upsert: true
-            });
-            MajorEvent.update({name: event.name}, item, {upsert: true}, function (err) {
-              if(err)
-                console.log(err);
-            });
-        }
-
-        for (var i = 0; i < teamInfo.length; i++) {
-            var team = teamInfo[i];
-            var item = new TeamInfo({
-                teamname: team.teamname,
-                country: team.country,
-                totalEarning: team.totalEarning,
-                logo: team.logo,
-                upsert: true
-            });
-            TeamInfo.update({teamname: event.teamname}, item, {upsert: true}, function (err) {
-              if(err)
-                console.log(err);
-            });
-        }
-    });
-}
-
 function getMajorEvent() {
     var db = getConnection();
     db.on('error', console.error.bind(console, 'connection error:'));
@@ -162,25 +98,26 @@ function getTotalEarningByCountry(socket, data){
     var db = getConnection();
     db.on('error', console.error.bind(console, 'connection error:'));
     db.once('open', function () {
-        TeamInfo.find({}).limit(5).select('teamname country totalEarning').exec(function(err, teams){
-          db.close();
+        TeamInfo.find({}).sort({totalEarning: -1}).limit(10).select('teamname country totalEarning').exec(function(err, teams){
+          if(err)
+            console.log(err);
+
           var formatted_items = [];
           var totalEarningByRes = 0;
 
           for (var i = 0; i < teams.length; i++) {
-            totalEarning = teams[i].totalEarning;
-            //formatted_totalEarning = totalEarning.replace("$", "");
+            var team = teams[i];
             var item = {
               name: teams[i].teamname,
+              country: teams[i].country,
               totalEarning: teams[i].totalEarning,
             };
             formatted_items.push(item);
-            totalEarningByRes+=teams[i].totalEarning;
+            totalEarningByRes+= teams[i].totalEarning;
           }
 
           for (var i = 0; i < formatted_items.length; i++) {
             formatted_items[i].y = (formatted_items[i].totalEarning * 100) / totalEarningByRes;
-            console.log(totalEarningByRes);
           }
 
           var formatted_data = [{
@@ -188,7 +125,7 @@ function getTotalEarningByCountry(socket, data){
               colorByPoint: true,
               data: formatted_items
           }];
-
+          db.close();
           socket.emit("sendTotalEarningByCountry", formatted_data);
         })
     });

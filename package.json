@@ -6,7 +6,8 @@
   "scripts": {
     "install": "node crawling.js",
     "postinstall": "node createJson.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node crawling.js && node createJson.js",
+    "start": "node server.js"
   },
   "keywords": [
     "csgostats"

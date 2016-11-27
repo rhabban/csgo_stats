@@ -1,5 +1,4 @@
-## Synopsis
-//November 2016
+## Synopsis 27/11/16
 CSGO_STATS is a university project **realised by Corentin Chupin and Bastien Sebire** at Université Normandie Caen.
 
 ## Pre-requisites
@@ -8,11 +7,14 @@ CSGO_STATS is a university project **realised by Corentin Chupin and Bastien Seb
 - Mongodb installed
 
 ## Installation
-- open mongodb and use CSGO_STATS base
 - type "npm install" to install dependencies
-- type "npm test" to install databases (mongodb must be open)
+- start mongo
+- type "npm test" to install databases
+
+## Configuration
+You can add or edit Exchange Rates in file ./config.json
 
 ## Usage
-- open mongodb
+- start mongo
 - type "npm test" to update databases
 - type "npm start" to load application then go to http://localhost:8080/

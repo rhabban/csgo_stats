@@ -1,13 +1,12 @@
 {
   "name": "csgostats_2",
   "version": "1.0.0",
-  "description": "Crawling and Visualising data",
+  "description": "CSGO_STATS is a university project **realised by Corentin Chupin and Bastien Sebire** at Université Normandie Caen.",
   "main": "server.js",
   "scripts": {
-    "install": "node crawling.js",
-    "postinstall": "node createJson.js",
-    "test": "node crawling.js && node createJson.js",
-    "start": "node server.js"
+    "test": "node crawling.js",
+    "start": "node server.js",
+    "pretest": "node uninstall.js"
   },
   "keywords": [
     "csgostats"
@@ -19,6 +18,7 @@
     "express": "^4.14.0",
     "forEachAsync": "^3.0.0",
     "jsonfile": "^2.4.0",
+    "mongodb": "^2.2.11",
     "mongoose": "^4.7.0",
     "socket.io": "^1.6.0"
   }

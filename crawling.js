@@ -92,7 +92,7 @@ function insertDataInDb() {
             });
             MajorEvent.update({name: event.name}, item, {upsert: true}, function (err) {
               if(err)
-                console.log(err);
+                console.log("MajorEventUpdate: "+err);
             });
         }
 
@@ -112,7 +112,7 @@ function insertDataInDb() {
             });
             MinorEvent.update({name: event.name}, item, {upsert: true}, function (err) {
               if(err)
-                console.log(err);
+                console.log("MinorEventUpdate: "+err);
             });
         }
 
@@ -135,7 +135,9 @@ function insertDataInDb() {
             });
             TeamInfo.update({teamname: team.teamname}, item, {upsert: true}, function (err) {
               if(err)
-                console.log(err);
+                console.log("TeamUpdate: "+err);
+              if(i == teamInfo.length)
+                process.exit();
             });
         }
     });

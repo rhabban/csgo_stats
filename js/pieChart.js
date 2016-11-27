@@ -1,11 +1,11 @@
-var loadChart = function(data, pays){
+var loadPieChart = function(data, pays){
   if(!pays)
       pays = "All";
   if(!data){
       return false;
   }
   $(function () {
-      Highcharts.chart('chartContainer', {
+      Highcharts.chart('pieContainer', {
           chart: {
               plotBackgroundColor: null,
               plotBorderWidth: null,
@@ -13,7 +13,7 @@ var loadChart = function(data, pays){
               type: 'pie'
           },
           title: {
-              text: 'Total earned (of all time) for : '+pays
+              text: 'Top 20 Teams : Total earned (of all time)'
           },
           tooltip: {
               pointFormat: '{series.name}: <b>{point.totalEarning}$</b>'

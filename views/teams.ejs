@@ -20,7 +20,8 @@
         <script src="https://code.highcharts.com/highcharts.js"></script>
         <script src="https://code.highcharts.com/modules/exporting.js"></script>
 
-        <script src="/js/pie.js"></script>
+        <script src="/js/pieChart.js"></script>
+        <script src="/js/columnChart.js"></script>
 
         <link rel="stylesheet" href="/css/main.css">
     </head>
@@ -46,10 +47,24 @@
                 </ul>
             </div>
 
-            <br>
-            <br>
-            <div id="chartContainer" style="min-width: 310px; height: 400px; max-width: 600px; margin: 0 auto"></div>
-            <hr>
+            <br/>
+            <br/>
+            <!-- Pie Chart -->
+            <div id="pieContainer" style="min-width: 310px; height: 400px; max-width: 600px; margin: 0 auto"></div>
+
+            <br/>
+            <br/>
+
+            <!-- Column Chart -->
+            <div id="columnContainer" style="min-width: 400px; height: 400px; margin: 0 auto"></div>
+
+
+            <!-- Zommable chart link -->
+            <a type="button" class="btn btn-primary" href="/zoomableChart" target="_blank"><span class="glyphicon glyphicon-blackboard" aria-hidden="true"></span> Zommable Chart</a>
+            <hr/>
+
+
+            <!-- Table display -->
             <div class="row well">
 
               <table id="teamsTable" class="table table-hover">
@@ -84,10 +99,12 @@
         var socket = io.connect('http://localhost:8080');
 
         socket.emit("getTotalEarningByCountry", "All");
+        socket.emit("getEarningDistribution");
 
         $(document).ready(function() {
           $('#teamsTable').dataTable();
-          loadChart();
+          loadPieChart();
+          loadColumnChart();
         });
 
         $('#teamsTable').on('click', '.clickable-row', function(event) {
@@ -99,8 +116,12 @@
         });
 
         socket.on('sendTotalEarningByCountry', function(data){
-            loadChart(data);
-        })
+            loadPieChart(data);
+        });
+
+        socket.on('sendEarningDistribution', function(data){
+            loadColumnChart(data);
+        });
 
     </script>
 </html>

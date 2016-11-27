@@ -1,0 +1,24 @@
+{
+  "name": "csgostats_2",
+  "version": "1.0.0",
+  "description": "Crawling and Visualising data",
+  "main": "server.js",
+  "scripts": {
+    "install": "node crawling.js",
+    "postinstall": "node createJson.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "csgostats"
+  ],
+  "author": "Chupin Corentin & Sebire Bastien",
+  "license": "ISC",
+  "dependencies": {
+    "ejs": "^2.5.2",
+    "express": "^4.14.0",
+    "forEachAsync": "^3.0.0",
+    "jsonfile": "^2.4.0",
+    "mongoose": "^4.7.0",
+    "socket.io": "^1.6.0"
+  }
+}

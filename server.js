@@ -90,6 +90,9 @@ io.on('connection', function (socket) {
     socket.on('getEarningDistribution', function() {
         getEarningDistribution(socket);
     });
+    socket.on('getMajorEventByCountry', function() {
+        getMajorEventByCountry(socket);
+    });
 });
 
 function getMajorEvent() {
@@ -210,6 +213,10 @@ function getEarningDistribution(socket){
             socket.emit("sendEarningDistribution", formatted_data);
         })
     });
+}
+
+function getMajorEventByCountry(){
+    return false;
 }
 
 function getEventsCount(events)

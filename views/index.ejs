@@ -49,6 +49,10 @@
                 <br>
 
                 <div id="chartContainer" style="min-width: 310px; height: 400px; max-width: 600px; margin: 0 auto"></div>
+                <br/>
+                <br/>
+
+                <div id="columnContainer" style="min-width: 310px; height: 400px; max-width: 600px; margin: 0 auto"></div>
                 <hr>
                 <div class="row well">
                     <table id="majorEventsTable" class="table table-hover">
@@ -84,10 +88,17 @@
         </div>
     </body>
 
+    <script src="/socket.io/socket.io.js"></script>
     <script type="text/javascript">
+        var socket = io.connect('http://localhost:8080');
+
+        socket.emit("getTotalEarningByCountry", "All");
+        socket.emit("getMajorEventByCountry", null);
+
         $(document).ready(function() {
           $('#majorEventsTable').dataTable();
           lineChart();
+          loadColumnChart();
         });
 
         $('#majorEventsTable').on('click', '.clickable-row', function(event) {

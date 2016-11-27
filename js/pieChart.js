@@ -13,7 +13,7 @@ var loadPieChart = function(data, pays){
               type: 'pie'
           },
           title: {
-              text: 'Top 20 Teams : Total earned (of all time)'
+              text: 'Top 10 Teams : Total earned (of all time)'
           },
           tooltip: {
               pointFormat: '{series.name}: <b>{point.totalEarning}$</b>'

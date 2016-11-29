@@ -90,6 +90,9 @@ io.on('connection', function (socket) {
     socket.on('getEarningDistribution', function() {
         getEarningDistribution(socket);
     });
+    socket.on('getEventsCount', function() {
+        getEventsCount(socket);
+    });
     socket.on('getMajorEventByCountry', function() {
         getMajorEventByCountry(socket);
     });
@@ -219,22 +222,43 @@ function getMajorEventByCountry(){
     return false;
 }
 
-function getEventsCount(events)
+function getEventsCount(socket)
 {
-    var dataCount = [];
-    for(var i = 2012; i <= 2016; i++)
-    {
-        var count = 0;
-        events.forEach(function(event)
+    var db = getConnection();
+    db.on('error', console.error.bind(console, 'connection error:'));
+
+    var data = [];
+    db.once('open', function () {
+        MajorEvent.find({}, function (err, events) 
         {
-            console.log(event.date);
-            if(event.date.includes(i))
+            for(i = 0; i < events.length; i++)
             {
-                count++;
+                var event = events[i];
+                if(!data[event.date.substring(0, 4)])
+                {
+                    data[event.date.substring(0, 4)] = [];
+                }
+
+                data[event.date.substring(0, 4)].push(event);
+                
             }
+
+            var data_formatted = [];
+            for(key in data)
+            {
+                totalEarning = 0;
+                for(i = 0; i < data[key].length; i++)
+                {
+                    totalEarning += parseInt(data[key][i].prizepool);
+                }
+                data_formatted.push({'year' : key , 'count' : data[key].length, 'totalEarning' : totalEarning})
+            }
+
+            db.close();
+            socket.emit("sendEventsCount", data_formatted);
         });
-        dataCount[i] = count;
-    }
+
+    });
 }
 
 function getConnection(){

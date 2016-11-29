@@ -1,12 +1,23 @@
-var lineChart = function () {
+var lineChart = function (data) {
     $(function () {
+
+        categories = [];
+        series = [];
+        totalEarning = [];
+
+        for(key in data)
+        {
+            categories.push(data[key].year);
+            series.push(data[key].count);
+        }
+
         Highcharts.chart('chartContainer', {
             title: {
                 text: 'Major Events evolution',
                 x: -20 //center
             },
             xAxis: {
-                categories: ['2012', '2013', '2014', '2015', '2016']
+                categories: categories
             },
             yAxis: {
                 title: {
@@ -29,8 +40,11 @@ var lineChart = function () {
             },
             series: [{
                 name: 'Events',
-                data: [2,4,5,6,7]
-            }]
+                data: series
+            },
+                name: 'Total Earning',
+                data: series
+            ]
         });
     });
 }

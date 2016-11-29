@@ -21,6 +21,7 @@
         <script src="https://code.highcharts.com/highcharts.js"></script>
         <script src="https://code.highcharts.com/modules/exporting.js"></script>
         <script src="/js/line-basic.js"></script>
+        <script src="/js/combo-dual-axes.js"></script>
         <link rel="stylesheet" href="/css/main.css">
     </head>
     <body>
@@ -49,10 +50,6 @@
                 <br>
 
                 <div id="chartContainer" style="min-width: 310px; height: 400px; max-width: 600px; margin: 0 auto"></div>
-                <br/>
-                <br/>
-
-                <div id="columnContainer" style="min-width: 310px; height: 400px; max-width: 600px; margin: 0 auto"></div>
                 <hr>
                 <div class="row well">
                     <table id="majorEventsTable" class="table table-hover">
@@ -92,13 +89,17 @@
     <script type="text/javascript">
         var socket = io.connect('http://localhost:8080');
 
-        socket.emit("getTotalEarningByCountry", "All");
         socket.emit("getMajorEventByCountry", null);
+
+        socket.emit("getEventsCount");
+         socket.on('sendEventsCount', function(data){
+          console.log(data);
+              //lineChart(data);
+              comboDualAxes(data);
+          });
 
         $(document).ready(function() {
           $('#majorEventsTable').dataTable();
-          lineChart();
-          loadColumnChart();
         });
 
         $('#majorEventsTable').on('click', '.clickable-row', function(event) {

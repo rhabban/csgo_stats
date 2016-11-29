@@ -90,12 +90,19 @@ io.on('connection', function (socket) {
     socket.on('getEarningDistribution', function() {
         getEarningDistribution(socket);
     });
-    socket.on('getEventsCount', function() {
-        getEventsCount(socket);
+    socket.on('getMajorEventsCount', function() {
+        getEventsCount(socket, "Majors");
     });
-    socket.on('getMajorEventByCountry', function() {
-        getMajorEventByCountry(socket);
+    socket.on('getMajorEventsByYear', function(year) {
+        getEventsCountByYear(socket, year, "Majors");
     });
+    socket.on('getMinorEventsCount', function(year) {
+        getEventsCount(socket, "Minors");
+    });
+    socket.on('getMinorEventsByYear', function(year) {
+        getEventsCountByYear(socket, year, "Minors");
+    });
+
 });
 
 function getMajorEvent() {
@@ -218,29 +225,33 @@ function getEarningDistribution(socket){
     });
 }
 
-function getMajorEventByCountry(){
-    return false;
-}
-
-function getEventsCount(socket)
+function getEventsCount(socket, type)
 {
     var db = getConnection();
     db.on('error', console.error.bind(console, 'connection error:'));
 
     var data = [];
+    var scheme;
+
+    if(type == "Majors"){
+        scheme = MajorEvent;
+    } else if(type == "Minors"){
+        scheme = MinorEvent;
+    }
     db.once('open', function () {
-        MajorEvent.find({}, function (err, events) 
+        scheme.find({}, function (err, events)
         {
             for(i = 0; i < events.length; i++)
             {
                 var event = events[i];
-                if(!data[event.date.substring(0, 4)])
+                var event_year = event.date.substring(0, 4);
+                if(!data[event_year])
                 {
-                    data[event.date.substring(0, 4)] = [];
+                    data[event_year] = [];
                 }
 
-                data[event.date.substring(0, 4)].push(event);
-                
+                data[event_year].push(event);
+
             }
 
             var data_formatted = [];
@@ -255,7 +266,55 @@ function getEventsCount(socket)
             }
 
             db.close();
-            socket.emit("sendEventsCount", data_formatted);
+            socket.emit("sendEventsCount", {type_event: type, "year":"All time", "series":data_formatted});
+        });
+
+    });
+}
+
+function getEventsCountByYear(socket, year, type)
+{
+    var db = getConnection();
+    db.on('error', console.error.bind(console, 'connection error:'));
+
+    var data = {1:[], 2:[], 3:[], 4:[], 5:[], 6:[], 7:[], 8:[], 9:[], 10:[], 11:[],12:[]};
+    var scheme;
+
+    if(type == "Majors"){
+        scheme = MajorEvent;
+    } else if(type == "Minors"){
+        scheme = MinorEvent;
+    }
+
+    db.once('open', function () {
+        scheme.find({}, function (err, events)
+        {
+            for(i = 0; i < events.length; i++)
+            {
+                var event = events[i];
+
+                var event_year = event.date.substring(0,4);
+                var event_month = event.date.substring(5,7);
+                if(event_year != year){
+                    continue;
+                }
+
+                data[parseInt(event_month)].push(event);
+            }
+
+            var data_formatted = [];
+            for(key in data)
+            {
+                totalEarning = 0;
+                for(i = 0; i < data[key].length; i++)
+                {
+                    totalEarning += parseInt(data[key][i].prizepool);
+                }
+                data_formatted.push({'year' : key , 'count' : data[key].length, 'totalEarning' : totalEarning});
+            }
+
+            db.close();
+            socket.emit("sendEventsCount", {type_event: type, "year":year, "series":data_formatted});
         });
 
     });

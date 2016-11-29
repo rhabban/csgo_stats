@@ -4,11 +4,11 @@ var comboDualAxes = function (data) {
     eventCount = [];
     totalEarning = [];
 
-    for(key in data)
+    for(key in data.series)
     {
-        year.push(data[key].year);
-        eventCount.push(data[key].count);
-        totalEarning.push(data[key].totalEarning)
+        year.push(data.series[key].year);
+        eventCount.push(data.series[key].count);
+        totalEarning.push(data.series[key].totalEarning)
     }
 
     Highcharts.chart('chartContainer', {
@@ -16,7 +16,7 @@ var comboDualAxes = function (data) {
             zoomType: 'xy'
         },
         title: {
-            text: 'Major Events evolution'
+            text: data.type_event+' Events evolution ('+data.year+')'
         },
         xAxis: [{
             categories: year,

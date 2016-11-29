@@ -10,7 +10,6 @@
         <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/themes/smoothness/jquery-ui.css" />
         <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/jquery-ui.min.js"></script>
         <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
-        <script src="http://d3js.org/d3.v3.min.js"></script>
 
 
         <link href="https://cdn.datatables.net/plug-ins/1.10.7/integration/bootstrap/3/dataTables.bootstrap.css" rel="stylesheet" />
@@ -20,7 +19,7 @@
         <!-- Hightcharts lib -->
         <script src="https://code.highcharts.com/highcharts.js"></script>
         <script src="https://code.highcharts.com/modules/exporting.js"></script>
-        <script src="/js/line-basic.js"></script>
+
         <script src="/js/combo-dual-axes.js"></script>
         <link rel="stylesheet" href="/css/main.css">
     </head>
@@ -48,7 +47,14 @@
 
                 <br>
                 <br>
-
+                <select class="form-control years">
+                    <option selected>All time</option>
+                    <option>2016</option>
+                    <option>2015</option>
+                    <option>2014</option>
+                    <option>2013</option>
+                    <option>2012</option>
+                </select>
                 <div id="chartContainer" style="min-width: 310px; height: 400px; max-width: 600px; margin: 0 auto"></div>
                 <hr>
                 <div class="row well">
@@ -88,15 +94,21 @@
     <script src="/socket.io/socket.io.js"></script>
     <script type="text/javascript">
         var socket = io.connect('http://localhost:8080');
+        socket.emit("getMajorEventsCount");
 
-        socket.emit("getMajorEventByCountry", null);
+        socket.on('sendEventsCount', function(data){
+            console.log(data);
+            //lineChart(data);
+            comboDualAxes(data);
+        });
 
-        socket.emit("getEventsCount");
-         socket.on('sendEventsCount', function(data){
-          console.log(data);
-              //lineChart(data);
-              comboDualAxes(data);
-          });
+        $(".years").on('change', function(e){
+            if(this.value == "All time"){
+                socket.emit("getMajorEventsCount", this.value);
+            } else {
+                socket.emit("getMajorEventsByYear", this.value);
+            }
+        })
 
         $(document).ready(function() {
           $('#majorEventsTable').dataTable();
